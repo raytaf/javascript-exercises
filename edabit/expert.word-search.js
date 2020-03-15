@@ -1,46 +1,46 @@
 /* --------------------------------------------------------------- WORD SEARCH */
 /* - https://edabit.com/challenge/x3XbfkKTjj4rr45Xi */
 const wordSearch = (letters, words) => {
-    let store       = {
-        match : 0,
-        index : 0 // TODO : Bila pakai array map pada array diagonal mungkin bisa dihilangkan saja
+    const cloneNestedArray      = param => param.map(v => [...v])
+    const reverseNestedString   = param => param.map(v => v.split('').reverse().join(''))
+    const generateDiagonalArray = param => {
+        return [
+            ...param.map(v => JSON.stringify(
+                param.map((sv,i) => {
+                    let val = sv[i]
+                    sv.splice(i, 1)
+                    return val
+                })
+            ).replace(/\W|null/g, '')),
+            ...param.map(v => JSON.stringify(
+                param.map((sv) => sv.pop())
+            ).replace(/\W|null/g, ''))
+        ]
     }
 
-    let horzLetters = letters.match(/.{1,8}/g)
-    let horzReverse = horzLetters.map(v => v.split('').reverse().join(''))
-    let arrLetters  = horzLetters.map(v => v.split(''))
-    let vertLetters = arrLetters[0].map((v, i) => JSON.stringify(arrLetters.map( sv => sv[i]) ).replace(/\W/g, ''))
-    let vertReverse = vertLetters.map(v => v.split('').reverse().join(''))
+    const horizontal    = letters.match(/.{1,8}/g)
+    const horizontalRev = reverseNestedString(horizontal)
+    const arrayLetters  = horizontal.map(v => v.split(''))
+    const vertical      = arrayLetters[0].map((v, i) => JSON.stringify(arrayLetters.map(sv => sv[i])).replace(/\W/g, ''))
+    const verticalRev   = reverseNestedString(vertical)
+    const diagonalBottomRight    = generateDiagonalArray(cloneNestedArray(arrayLetters))
+    const diagonalBottomRightRev = reverseNestedString(diagonalBottomRight)
+    const diagonalUpperRight     = generateDiagonalArray(cloneNestedArray(arrayLetters).reverse())
+    const diagonalUpperRightRev  = reverseNestedString(diagonalUpperRight)
 
-    
-    // TODO : Untuk sementara hanya bisa mencari teks secara diagonal ke kanan bawah dari array index ke-0 saja
-    //        Masih bisa dioptimalkan menggunakan array map daripada menggunakan for
-    let arrDiagonal = []
-    for (let i = 0; i < arrLetters.length; i++) {
-        for (let si = 0; si < arrLetters[0].length; si++) {
-            if (arrLetters[i][store.index] !== undefined) {
-                if (arrDiagonal[si] === undefined) arrDiagonal.push([])
-                arrDiagonal[si].push(arrLetters[i][store.index])
-            }
-            if (si === arrLetters[0].length - 1) store.index = i
-            store.index++
-        }        
-    }
-    let dglRLetters = arrDiagonal.map(v => JSON.stringify(v).replace(/\W/g, ''))
-    let dglRReverse = dglRLetters.map(v => v.split('').reverse().join(''))
-    // END TODO :
-
-    words.map( v => v.toUpperCase() ).forEach( v => {
-        if ([...horzLetters, ...vertLetters, ...horzReverse, ...vertReverse].find( sv => sv.includes(v)) !== undefined) {
-            store.match += 1
-            words.splice(words.indexOf(v), 1)
+    let match = 0
+    words.map(v => v.toUpperCase()).forEach(v => {
+        if (
+            [...horizontal,  ...horizontalRev, ...vertical, ...verticalRev,
+                ...diagonalBottomRight, ...diagonalBottomRightRev, ...diagonalUpperRight, ...diagonalUpperRightRev
+            ].find(sv => sv.includes(v)) !== undefined
+        ) {
+            match += 1
         }
     })
 
-    if (store.match === words.length)
-        return true
-    else
-        return false
+    if (match === words.length) return true
+    else return false
 }
 
 /* Check Word Search --------------------------------------------------------------- */
