@@ -1,9 +1,6 @@
 /* --------------------------------------------------------------- WORDS WITH DUPLICATE LETTERS */
 /* - ttps://edabit.com/challenge/ztJZiCZeXATC9KDHX */
-const noDuplicateLetters = (phrase) => {
-    const phrArr = phrase.replace(/[^\w\s]/gi, '').toLowerCase().split(' ').map(v => v.split('').sort())
-    return phrArr.every(v => v.every((sv, sk) => sk > 0 ? sv !== v[sk - 1] : true ))
-}
+const noDuplicateLetters = p => p.toLowerCase().split(' ').every(v => new Set(v).size === v.length)
 
 /* Check Words with Duplicate Letters --------------------------------------------------------------- */
 noDuplicateLetters("Fortune favours the bold.") // true
